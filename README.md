@@ -55,4 +55,7 @@ Plugin should work transparently without any actions. Example output looks like 
 17:18:55,802 INFO  filters.LogOutputResponseFilter  - >> #2 responded with ''
 ```
 
+## Kudos
+
+Many kudos to [Marek Maj](https://github.com/MarekMaj) for his `MultiReadHttpServletResponse` class.
 
