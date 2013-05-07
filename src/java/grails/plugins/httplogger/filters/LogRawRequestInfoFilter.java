@@ -16,8 +16,8 @@
 
 package grails.plugins.httplogger.filters;
 
-import com.google.common.io.CharStreams;
 import grails.plugins.httplogger.HttpLogger;
+import org.apache.commons.io.IOUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -77,7 +77,7 @@ public class LogRawRequestInfoFilter extends GenericFilterBean {
             logger.info("<< #" + requestNumber + ' ' + "headers " + values);
         }
         if ("POST".equalsIgnoreCase(method)) {
-            logger.info("<< #" + requestNumber + ' ' + "body: '" + CharStreams.toString(httpServletRequest.getReader()) + "'");
+            logger.info("<< #" + requestNumber + ' ' + "body: '" + IOUtils.toString(httpServletRequest.getReader()) + "'");
         }
     }
 
