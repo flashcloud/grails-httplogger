@@ -15,18 +15,18 @@
  */
 
 package grails.plugins.httplogger.filters;
-import grails.plugins.httplogger.HttpLogger;
 
-import java.io.IOException;
+import com.google.common.io.CharStreams;
+import grails.plugins.httplogger.HttpLogger;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
+import java.io.IOException;
 
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
@@ -74,10 +74,10 @@ public class LogRawRequestInfoFilter extends GenericFilterBean {
                 values.append(delimiter).append(name).append(": '").append(httpServletRequest.getHeader(name)).append('\'');
                 delimiter = ", ";
             }
-            logger.info("<< #" + requestNumber + ' ' + " headers " + values);
+            logger.info("<< #" + requestNumber + ' ' + "headers " + values);
         }
         if ("POST".equalsIgnoreCase(method)) {
-            logger.info("<< #" + requestNumber + ' ' + " body: '" + httpServletRequest.getReader() + "'");
+            logger.info("<< #" + requestNumber + ' ' + "body: '" + CharStreams.toString(httpServletRequest.getReader()) + "'");
         }
     }
 

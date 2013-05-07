@@ -16,20 +16,21 @@
 
 package grails.plugins.httplogger.filters;
 import grails.plugins.httplogger.HttpLogger;
-
-import java.io.IOException;
+import org.apache.commons.lang.ArrayUtils;
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import java.io.IOException;
+import java.util.Map;
 
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes;
-import org.springframework.web.filter.GenericFilterBean;
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
  */
-class LogGrailsUrlsInfoFilter extends GenericFilterBean {
+public class LogGrailsUrlsInfoFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -38,10 +39,21 @@ class LogGrailsUrlsInfoFilter extends GenericFilterBean {
         if (requestNumber != null) {
             String controllerName = (String) servletRequest.getAttribute(GrailsApplicationAttributes.CONTROLLER_NAME_ATTRIBUTE);
             String actionName = (String) servletRequest.getAttribute(GrailsApplicationAttributes.ACTION_NAME_ATTRIBUTE);
-            Object params = servletRequest.getParameterMap();
+            Map<String, String[]> params = servletRequest.getParameterMap();
+            String paramsString = "";
+
+            if (params.size() > 0) {
+                String delimiter = "";
+                StringBuilder values = new StringBuilder();
+                for(Map.Entry<String, String[]> entry : params.entrySet()) {
+                    values.append(delimiter).append('\'').append(entry.getKey()).append("':'").append(ArrayUtils.toString(entry.getValue())).append('\'');
+                    delimiter = ", ";
+                }
+                paramsString = values.toString();
+            }
 
             if (logger.isInfoEnabled()) {
-                logger.info("<< #" + requestNumber + " dispatched to " + controllerName + '/' + actionName + " with parsed params " + params + '.');
+                logger.info("<< #" + requestNumber + " dispatched to " + controllerName + '/' + actionName + " with parsed params [" + paramsString + "].");
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);
