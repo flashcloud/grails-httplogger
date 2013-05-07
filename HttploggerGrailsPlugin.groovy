@@ -18,7 +18,7 @@ import grails.plugins.httplogger.filters.LogOutputResponseFilter
 import grails.plugins.httplogger.filters.LogRawRequestInfoFilter
 import org.springframework.util.StringUtils
 
-class HttpLoggerGrailsPlugin {
+class HttploggerGrailsPlugin {
     def version = "1.0"
     def grailsVersion = "2.0 > *"
     def title = "Http Logger Plugin"
