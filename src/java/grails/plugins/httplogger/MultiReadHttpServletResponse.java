@@ -91,7 +91,7 @@ public class MultiReadHttpServletResponse extends HttpServletResponseWrapper {
         return copiedOutput;
     }
 
-    private class ServletOutputStreamImpl extends ServletOutputStream {
+    private static class ServletOutputStreamImpl extends ServletOutputStream {
 
         private OutputStream os;
         private ByteArrayOutputStream copy = new ByteArrayOutputStream(1024);

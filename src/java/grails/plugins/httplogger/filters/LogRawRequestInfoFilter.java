@@ -17,7 +17,7 @@
 package grails.plugins.httplogger.filters;
 
 import grails.plugins.httplogger.HttpLogger;
-import org.apache.commons.io.IOUtils;
+import grails.plugins.httplogger.MultiReadHttpServletRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -39,9 +39,10 @@ public class LogRawRequestInfoFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest)servletRequest;
-        addAttributes(httpServletRequest);
-        logRawRequestInfo(httpServletRequest);
-        filterChain.doFilter(servletRequest, servletResponse);
+        MultiReadHttpServletRequest requestWrapper = new MultiReadHttpServletRequest(httpServletRequest);
+        addAttributes(requestWrapper);
+        logRawRequestInfo(requestWrapper);
+        filterChain.doFilter(requestWrapper, servletResponse);
     }
 
     @Override
@@ -58,26 +59,26 @@ public class LogRawRequestInfoFilter extends GenericFilterBean {
         servletRequest.setAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE, requestNumber);
     }
 
-    protected void logRawRequestInfo(HttpServletRequest httpServletRequest) throws IOException {
+    protected void logRawRequestInfo(MultiReadHttpServletRequest requestWrapper) throws IOException {
         if (!logger.isInfoEnabled()) {
             return;
         }
 
-        Long requestNumber = (Long) httpServletRequest.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
-        String method = httpServletRequest.getMethod();
+        Long requestNumber = (Long) requestWrapper.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
+        String method = requestWrapper.getMethod();
 
-        logger.info("<< #" + requestNumber + ' ' + method + ' ' + createRequestUrl(httpServletRequest));
+        logger.info("<< #" + requestNumber + ' ' + method + ' ' + createRequestUrl(requestWrapper));
         if (headersArray.length > 0) {
             String delimiter = "";
             StringBuilder values = new StringBuilder();
             for (String name : headersArray) {
-                values.append(delimiter).append(name).append(": '").append(httpServletRequest.getHeader(name)).append('\'');
+                values.append(delimiter).append(name).append(": '").append(requestWrapper.getHeader(name)).append('\'');
                 delimiter = ", ";
             }
             logger.info("<< #" + requestNumber + ' ' + "headers " + values);
         }
         if ("POST".equalsIgnoreCase(method)) {
-            logger.info("<< #" + requestNumber + ' ' + "body: '" + IOUtils.toString(httpServletRequest.getReader()) + "'");
+            logger.info("<< #" + requestNumber + ' ' + "body: '" + requestWrapper.getCopiedInput() + "'");
         }
     }
 
