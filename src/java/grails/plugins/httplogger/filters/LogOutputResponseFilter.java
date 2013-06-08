@@ -16,37 +16,27 @@
 
 package grails.plugins.httplogger.filters;
 import grails.plugins.httplogger.HttpLogger;
+import grails.plugins.httplogger.MultiReadHttpServletRequest;
 import grails.plugins.httplogger.MultiReadHttpServletResponse;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.filter.GenericFilterBean;
+import java.io.IOException;
 
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
  */
-public class LogOutputResponseFilter extends GenericFilterBean {
+public class LogOutputResponseFilter extends HttpLoggerFilter {
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        MultiReadHttpServletResponse responseWrapper = new MultiReadHttpServletResponse((HttpServletResponse) servletResponse);
-
-        filterChain.doFilter(servletRequest, responseWrapper);
-
+    protected void logResponse(MultiReadHttpServletRequest requestWrapper, MultiReadHttpServletResponse responseWrapper) throws IOException, ServletException {
         responseWrapper.flushBuffer();
 
         if (!logger.isInfoEnabled()) {
             return;
         }
 
-        Long requestNumber = (Long) servletRequest.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
-        Long startTime = (Long) servletRequest.getAttribute(HttpLogger.START_TIME_ATTRIBUTE);
+        Long requestNumber = (Long) requestWrapper.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
+        Long startTime = (Long) requestWrapper.getAttribute(HttpLogger.START_TIME_ATTRIBUTE);
         long elapsedTime = System.currentTimeMillis() - startTime;
 
         logger.info(">> #" + requestNumber + " returned " + responseWrapper.getStatus() + ", took " + elapsedTime + " ms.");

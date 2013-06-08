@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import grails.plugins.httplogger.AntPathRequestMatcher
 import grails.plugins.httplogger.filters.LogGrailsUrlsInfoFilter
 import grails.plugins.httplogger.filters.LogOutputResponseFilter
 import grails.plugins.httplogger.filters.LogRawRequestInfoFilter
@@ -43,10 +44,6 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
     def issueManagement = [ system: "GitHub", url: "https://github.com/TouK/grails-httplogger/issues" ]
     def scm = [ url: "https://github.com/TouK/grails-httplogger" ]
 
-    Map getConfiguration() {
-        application.config.grails.plugins.httplogger
-    }
-
     def getWebXmlFilterOrder() {
         def FilterManager = getClass().getClassLoader().loadClass('grails.plugin.webxml.FilterManager')
         [
@@ -56,11 +53,19 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
         ]
     }
 
+    def doWithSpring = {
+        Map configuration = application.config.grails.plugins.httplogger
+
+        loggableRequestMatcher(AntPathRequestMatcher) {
+            includeUrls = configuration.includeUrls ?: []
+            excludeUrls = configuration.excludeUrls ?: []
+        }
+    }
+    
     def doWithWebDescriptor = { webXml ->
         Map configuration = application.config.grails.plugins.httplogger
         Boolean enabled = configuration.enabled == null ? true : configuration.enabled
         String headers = configuration.headers ?: 'Cookie'
-        String urlPattern = configuration.urlPattern ?: '/*'
         if (!enabled) return
 
         def contextParam = webXml.'context-param'
@@ -90,7 +95,7 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
             filter[filter.size() - 1] + {
                 'filter-mapping'{
                     'filter-name'(StringUtils.uncapitalize(filterClass.simpleName))
-                    'url-pattern'(urlPattern)
+                    'url-pattern'('/*')
                     'dispatcher'('REQUEST')
                 }
             }

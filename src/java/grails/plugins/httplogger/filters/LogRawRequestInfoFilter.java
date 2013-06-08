@@ -31,24 +31,14 @@ import java.io.IOException;
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
  */
-public class LogRawRequestInfoFilter extends GenericFilterBean {
+public class LogRawRequestInfoFilter extends HttpLoggerFilter {
 
-    private String headers;
     private String[] headersArray;
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest)servletRequest;
-        MultiReadHttpServletRequest requestWrapper = new MultiReadHttpServletRequest(httpServletRequest);
+    protected void logRequest(MultiReadHttpServletRequest requestWrapper) throws IOException, ServletException {
         addAttributes(requestWrapper);
         logRawRequestInfo(requestWrapper);
-        filterChain.doFilter(requestWrapper, servletResponse);
-    }
-
-    @Override
-    protected void initFilterBean() throws ServletException {
-        super.initFilterBean();
-        headersArray = StringUtils.tokenizeToStringArray(headers, ",");
     }
 
     protected void addAttributes(HttpServletRequest servletRequest) {
@@ -87,6 +77,6 @@ public class LogRawRequestInfoFilter extends GenericFilterBean {
     }
 
     public void setHeaders(String headers) {
-        this.headers = headers;
+        this.headersArray = StringUtils.tokenizeToStringArray(headers, ",");
     }
 }

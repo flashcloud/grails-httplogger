@@ -16,30 +16,26 @@
 
 package grails.plugins.httplogger.filters;
 import grails.plugins.httplogger.HttpLogger;
+import grails.plugins.httplogger.MultiReadHttpServletRequest;
 import org.apache.commons.lang.ArrayUtils;
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes;
-import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
  */
-public class LogGrailsUrlsInfoFilter extends GenericFilterBean {
-
+public class LogGrailsUrlsInfoFilter extends HttpLoggerFilter {
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        Long requestNumber = (Long) servletRequest.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
+    protected void logRequest(MultiReadHttpServletRequest requestWrapper) throws IOException, ServletException {
+        Long requestNumber = (Long) requestWrapper.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
         // this filter has urlPattern '/*' so I need to determine if this request is marked with requestNumber
         if (requestNumber != null) {
-            String controllerName = (String) servletRequest.getAttribute(GrailsApplicationAttributes.CONTROLLER_NAME_ATTRIBUTE);
-            String actionName = (String) servletRequest.getAttribute(GrailsApplicationAttributes.ACTION_NAME_ATTRIBUTE);
-            Map<String, String[]> params = servletRequest.getParameterMap();
+            String controllerName = (String) requestWrapper.getAttribute(GrailsApplicationAttributes.CONTROLLER_NAME_ATTRIBUTE);
+            String actionName = (String) requestWrapper.getAttribute(GrailsApplicationAttributes.ACTION_NAME_ATTRIBUTE);
+            Map<String, String[]> params = requestWrapper.getParameterMap();
             String paramsString = "";
 
             if (params.size() > 0) {
@@ -56,6 +52,5 @@ public class LogGrailsUrlsInfoFilter extends GenericFilterBean {
                 logger.info("<< #" + requestNumber + " dispatched to " + controllerName + '/' + actionName + " with parsed params [" + paramsString + "].");
             }
         }
-        filterChain.doFilter(servletRequest, servletResponse);
     }
 }
