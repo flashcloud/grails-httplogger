@@ -18,7 +18,6 @@ package grails.plugins.httplogger.filters;
 
 import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
-import grails.plugins.httplogger.RequestData;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletException;

@@ -1,5 +1,6 @@
-package grails.plugins.httplogger;
+package grails.plugins.httplogger.filters;
 
+import grails.plugins.httplogger.HttpLogger;
 import org.apache.commons.lang.ArrayUtils;
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes;
 
@@ -21,8 +22,7 @@ public class RequestData {
         return (Long) request.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
     }
     
-    //TODO make packege scope?
-    public void setRequestNumber(long requestNumber) {
+    void setRequestNumber(long requestNumber) {
         request.setAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE, requestNumber);
     }
 
@@ -34,8 +34,7 @@ public class RequestData {
         return (Long) request.getAttribute(HttpLogger.START_TIME_ATTRIBUTE);
     }
 
-    //TODO make packege scope?
-    public void setStartTimeMillis(long startTimeMillis) {
+    void setStartTimeMillis(long startTimeMillis) {
         request.setAttribute(HttpLogger.START_TIME_ATTRIBUTE, startTimeMillis);
     }
 
@@ -43,8 +42,7 @@ public class RequestData {
         return (Long) request.getAttribute(HttpLogger.END_TIME_ATTRIBUTE);
     }
 
-    //TODO make packege scope?
-    public void setEndTimeMillis(long endTimeMillis) {
+    void setEndTimeMillis(long endTimeMillis) {
         request.setAttribute(HttpLogger.END_TIME_ATTRIBUTE, endTimeMillis);
     }
 

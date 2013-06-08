@@ -17,7 +17,6 @@
 package grails.plugins.httplogger.filters;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
 import grails.plugins.httplogger.MultiReadHttpServletResponse;
-import grails.plugins.httplogger.RequestData;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
