@@ -24,5 +24,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HttpLogger {
     public static final AtomicLong REQUEST_NUMBER_COUNTER = new AtomicLong();
     public static final String START_TIME_ATTRIBUTE = "httplogger.startTime";
+    public static final String END_TIME_ATTRIBUTE = "httplogger.endTime";
     public static final String REQUEST_NUMBER_ATTRIBUTE = "httplogger.requestNumber";
 }

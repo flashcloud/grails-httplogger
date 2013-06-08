@@ -15,14 +15,11 @@
  */
 
 package grails.plugins.httplogger.filters;
-import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
-import org.apache.commons.lang.ArrayUtils;
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes;
+import grails.plugins.httplogger.RequestData;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
@@ -30,26 +27,16 @@ import java.util.Map;
 public class LogGrailsUrlsInfoFilter extends HttpLoggerFilter {
     @Override
     protected void logRequest(MultiReadHttpServletRequest requestWrapper) throws IOException, ServletException {
-        Long requestNumber = (Long) requestWrapper.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
+        RequestData requestData = new RequestData(requestWrapper);
+        Long requestNumber = requestData.getRequestNumber();
         // this filter has urlPattern '/*' so I need to determine if this request is marked with requestNumber
         if (requestNumber != null) {
-            String controllerName = (String) requestWrapper.getAttribute(GrailsApplicationAttributes.CONTROLLER_NAME_ATTRIBUTE);
-            String actionName = (String) requestWrapper.getAttribute(GrailsApplicationAttributes.ACTION_NAME_ATTRIBUTE);
-            Map<String, String[]> params = requestWrapper.getParameterMap();
-            String paramsString = "";
-
-            if (params.size() > 0) {
-                String delimiter = "";
-                StringBuilder values = new StringBuilder();
-                for(Map.Entry<String, String[]> entry : params.entrySet()) {
-                    values.append(delimiter).append('\'').append(entry.getKey()).append("':'").append(ArrayUtils.toString(entry.getValue())).append('\'');
-                    delimiter = ", ";
-                }
-                paramsString = values.toString();
-            }
+            String controllerName = requestData.getController();
+            String actionName = requestData.getAction();
+            String parameterMapAsString = requestData.getParameterMapAsString();
 
             if (logger.isInfoEnabled()) {
-                logger.info("<< #" + requestNumber + " dispatched to " + controllerName + '/' + actionName + " with parsed params [" + paramsString + "].");
+                logger.info("<< #" + requestNumber + " dispatched to " + controllerName + '/' + actionName + " with parsed params " + parameterMapAsString + ".");
             }
         }
     }

@@ -15,9 +15,9 @@
  */
 
 package grails.plugins.httplogger.filters;
-import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
 import grails.plugins.httplogger.MultiReadHttpServletResponse;
+import grails.plugins.httplogger.RequestData;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -30,14 +30,15 @@ public class LogOutputResponseFilter extends HttpLoggerFilter {
     @Override
     protected void logResponse(MultiReadHttpServletRequest requestWrapper, MultiReadHttpServletResponse responseWrapper) throws IOException, ServletException {
         responseWrapper.flushBuffer();
+        RequestData requestData = new RequestData(requestWrapper);
+        requestData.setEndTimeMillis(System.currentTimeMillis());
 
         if (!logger.isInfoEnabled()) {
             return;
         }
 
-        Long requestNumber = (Long) requestWrapper.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
-        Long startTime = (Long) requestWrapper.getAttribute(HttpLogger.START_TIME_ATTRIBUTE);
-        long elapsedTime = System.currentTimeMillis() - startTime;
+        Long requestNumber = requestData.getRequestNumber();
+        Long elapsedTime = requestData.getElapsedTimeMillis();
 
         logger.info(">> #" + requestNumber + " returned " + responseWrapper.getStatus() + ", took " + elapsedTime + " ms.");
         logger.info(">> #" + requestNumber + " responded with '" + responseWrapper.getCopiedOutput() + "'");

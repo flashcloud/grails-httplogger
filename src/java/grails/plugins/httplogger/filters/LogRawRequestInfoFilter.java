@@ -18,13 +18,10 @@ package grails.plugins.httplogger.filters;
 
 import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
+import grails.plugins.httplogger.RequestData;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
@@ -33,7 +30,7 @@ import java.io.IOException;
  */
 public class LogRawRequestInfoFilter extends HttpLoggerFilter {
 
-    private String[] headersArray;
+    private String[] headersToLog;
 
     @Override
     protected void logRequest(MultiReadHttpServletRequest requestWrapper) throws IOException, ServletException {
@@ -42,41 +39,30 @@ public class LogRawRequestInfoFilter extends HttpLoggerFilter {
     }
 
     protected void addAttributes(HttpServletRequest servletRequest) {
-        long startTime = System.currentTimeMillis();
-        long requestNumber = HttpLogger.REQUEST_NUMBER_COUNTER.incrementAndGet();
-
-        servletRequest.setAttribute(HttpLogger.START_TIME_ATTRIBUTE, startTime);
-        servletRequest.setAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE, requestNumber);
+        RequestData requestData = new RequestData(servletRequest);
+        requestData.setStartTimeMillis(System.currentTimeMillis());
+        requestData.setRequestNumber(HttpLogger.REQUEST_NUMBER_COUNTER.incrementAndGet());
     }
 
     protected void logRawRequestInfo(MultiReadHttpServletRequest requestWrapper) throws IOException {
         if (!logger.isInfoEnabled()) {
             return;
         }
+        RequestData requestData = new RequestData(requestWrapper);
 
-        Long requestNumber = (Long) requestWrapper.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
+        Long requestNumber = requestData.getRequestNumber();
         String method = requestWrapper.getMethod();
+        String urlWithQueryString = requestData.getUrlWithQueryString();
+        String headers = requestData.getHeadersAsString(headersToLog);
 
-        logger.info("<< #" + requestNumber + ' ' + method + ' ' + createRequestUrl(requestWrapper));
-        if (headersArray.length > 0) {
-            String delimiter = "";
-            StringBuilder values = new StringBuilder();
-            for (String name : headersArray) {
-                values.append(delimiter).append(name).append(": '").append(requestWrapper.getHeader(name)).append('\'');
-                delimiter = ", ";
-            }
-            logger.info("<< #" + requestNumber + ' ' + "headers " + values);
-        }
+        logger.info("<< #" + requestNumber + ' ' + method + ' ' + urlWithQueryString);
+        logger.info("<< #" + requestNumber + ' ' + "headers " + headers);
         if ("POST".equalsIgnoreCase(method)) {
             logger.info("<< #" + requestNumber + ' ' + "body: '" + requestWrapper.getCopiedInput() + "'");
         }
     }
 
-    protected String createRequestUrl(HttpServletRequest request) {
-        return request.getRequestURL().toString() + (request.getQueryString() == null ? "" : "?" + request.getQueryString());
-    }
-
     public void setHeaders(String headers) {
-        this.headersArray = StringUtils.tokenizeToStringArray(headers, ",");
+        this.headersToLog = StringUtils.tokenizeToStringArray(headers, ",");
     }
 }
