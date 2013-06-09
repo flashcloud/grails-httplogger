@@ -15,6 +15,7 @@
  */
 
 package grails.plugins.httplogger.filters;
+import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
 
 import javax.servlet.ServletException;
@@ -30,13 +31,7 @@ public class LogGrailsUrlsInfoFilter extends HttpLoggerFilter {
         Long requestNumber = requestData.getRequestNumber();
         // this filter has urlPattern '/*' so I need to determine if this request is marked with requestNumber
         if (requestNumber != null) {
-            String controllerName = requestData.getController();
-            String actionName = requestData.getAction();
-            String parameterMapAsString = requestData.getParameterMapAsString();
-
-            if (logger.isInfoEnabled()) {
-                logger.info("<< #" + requestNumber + " dispatched to " + controllerName + '/' + actionName + " with parsed params " + parameterMapAsString + ".");
-            }
+            getHttpLogger().logBeforeForwardOrError(requestWrapper, requestData);
         }
     }
 }

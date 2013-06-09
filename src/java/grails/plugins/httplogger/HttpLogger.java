@@ -16,14 +16,19 @@
 
 package grails.plugins.httplogger;
 
+import grails.plugins.httplogger.filters.RequestData;
+
+import javax.servlet.ServletException;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
  */
-public class HttpLogger {
-    public static final AtomicLong REQUEST_NUMBER_COUNTER = new AtomicLong();
-    public static final String START_TIME_ATTRIBUTE = "httplogger.startTime";
-    public static final String END_TIME_ATTRIBUTE = "httplogger.endTime";
-    public static final String REQUEST_NUMBER_ATTRIBUTE = "httplogger.requestNumber";
+public interface HttpLogger {
+    public void logBeforeRequest(MultiReadHttpServletRequest requestWrapper, RequestData requestData) throws IOException, ServletException;
+    
+    void logBeforeForwardOrError(MultiReadHttpServletRequest requestWrapper, RequestData requestData) throws IOException, ServletException;
+    
+    void logAfterResponse(MultiReadHttpServletRequest requestWrapper, MultiReadHttpServletResponse responseWrapper, RequestData requestData) throws IOException, ServletException;
 }

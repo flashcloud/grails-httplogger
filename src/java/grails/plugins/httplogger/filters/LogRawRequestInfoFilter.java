@@ -16,52 +16,25 @@
 
 package grails.plugins.httplogger.filters;
 
-import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Tomasz Kalkosiński <tomasz.kalkosinski@gmail.com>
  */
 public class LogRawRequestInfoFilter extends HttpLoggerFilter {
 
-    private String[] headersToLog;
+    private static final AtomicLong REQUEST_COUNTER = new AtomicLong();
 
     @Override
     protected void logRequest(MultiReadHttpServletRequest requestWrapper) throws IOException, ServletException {
-        addAttributes(requestWrapper);
-        logRawRequestInfo(requestWrapper);
-    }
-
-    protected void addAttributes(HttpServletRequest servletRequest) {
-        RequestData requestData = new RequestData(servletRequest);
-        requestData.setStartTimeMillis(System.currentTimeMillis());
-        requestData.setRequestNumber(HttpLogger.REQUEST_NUMBER_COUNTER.incrementAndGet());
-    }
-
-    protected void logRawRequestInfo(MultiReadHttpServletRequest requestWrapper) throws IOException {
-        if (!logger.isInfoEnabled()) {
-            return;
-        }
         RequestData requestData = new RequestData(requestWrapper);
-
-        Long requestNumber = requestData.getRequestNumber();
-        String method = requestWrapper.getMethod();
-        String urlWithQueryString = requestData.getUrlWithQueryString();
-        String headers = requestData.getHeadersAsString(headersToLog);
-
-        logger.info("<< #" + requestNumber + ' ' + method + ' ' + urlWithQueryString);
-        logger.info("<< #" + requestNumber + ' ' + "headers " + headers);
-        if ("POST".equalsIgnoreCase(method)) {
-            logger.info("<< #" + requestNumber + ' ' + "body: '" + requestWrapper.getCopiedInput() + "'");
-        }
+        requestData.setStartTimeMillis(System.currentTimeMillis());
+        requestData.setRequestNumber(REQUEST_COUNTER.incrementAndGet());
+        getHttpLogger().logBeforeRequest(requestWrapper, requestData);
     }
 
-    public void setHeaders(String headers) {
-        this.headersToLog = StringUtils.tokenizeToStringArray(headers, ",");
-    }
 }

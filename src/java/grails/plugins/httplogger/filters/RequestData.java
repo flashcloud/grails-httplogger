@@ -1,16 +1,20 @@
 package grails.plugins.httplogger.filters;
 
-import grails.plugins.httplogger.HttpLogger;
 import org.apache.commons.lang.ArrayUtils;
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Artur Gajowy <artur.gajowy@gmail.com>
  */
 public class RequestData {
+
+    private static final String START_TIME_ATTRIBUTE = "httplogger.startTime";
+    private static final String END_TIME_ATTRIBUTE = "httplogger.endTime";
+    private static final String REQUEST_NUMBER_ATTRIBUTE = "httplogger.requestNumber";
     
     private final HttpServletRequest request;
 
@@ -19,11 +23,11 @@ public class RequestData {
     }
 
     public Long getRequestNumber() {
-        return (Long) request.getAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE);
+        return (Long) request.getAttribute(REQUEST_NUMBER_ATTRIBUTE);
     }
     
     void setRequestNumber(long requestNumber) {
-        request.setAttribute(HttpLogger.REQUEST_NUMBER_ATTRIBUTE, requestNumber);
+        request.setAttribute(REQUEST_NUMBER_ATTRIBUTE, requestNumber);
     }
 
     public Long getElapsedTimeMillis() {
@@ -31,19 +35,19 @@ public class RequestData {
     }
 
     public Long getStartTimeMillis() {
-        return (Long) request.getAttribute(HttpLogger.START_TIME_ATTRIBUTE);
+        return (Long) request.getAttribute(START_TIME_ATTRIBUTE);
     }
 
     void setStartTimeMillis(long startTimeMillis) {
-        request.setAttribute(HttpLogger.START_TIME_ATTRIBUTE, startTimeMillis);
+        request.setAttribute(START_TIME_ATTRIBUTE, startTimeMillis);
     }
 
     public Long getEndTimeMillis() {
-        return (Long) request.getAttribute(HttpLogger.END_TIME_ATTRIBUTE);
+        return (Long) request.getAttribute(END_TIME_ATTRIBUTE);
     }
 
     void setEndTimeMillis(long endTimeMillis) {
-        request.setAttribute(HttpLogger.END_TIME_ATTRIBUTE, endTimeMillis);
+        request.setAttribute(END_TIME_ATTRIBUTE, endTimeMillis);
     }
 
     public String getUrlWithQueryString() {

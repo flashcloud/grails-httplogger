@@ -1,5 +1,6 @@
 package grails.plugins.httplogger.filters;
 
+import grails.plugins.httplogger.HttpLogger;
 import grails.plugins.httplogger.MultiReadHttpServletRequest;
 import grails.plugins.httplogger.MultiReadHttpServletResponse;
 import grails.plugins.httplogger.RequestMatcher;
@@ -21,11 +22,17 @@ import java.io.IOException;
 public abstract class HttpLoggerFilter extends GenericFilterBean {
 
     private RequestMatcher loggableRequestMatcher;
+    private HttpLogger httpLogger;
     
     @Override
     protected void initFilterBean() throws ServletException {
         WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
         loggableRequestMatcher = context.getBean("loggableRequestMatcher", RequestMatcher.class);
+        httpLogger = context.getBean("httpLogger", HttpLogger.class);
+    }
+
+    protected HttpLogger getHttpLogger() {
+        return httpLogger;
     }
 
     @Override

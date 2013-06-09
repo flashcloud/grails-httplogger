@@ -31,15 +31,6 @@ public class LogOutputResponseFilter extends HttpLoggerFilter {
         responseWrapper.flushBuffer();
         RequestData requestData = new RequestData(requestWrapper);
         requestData.setEndTimeMillis(System.currentTimeMillis());
-
-        if (!logger.isInfoEnabled()) {
-            return;
-        }
-
-        Long requestNumber = requestData.getRequestNumber();
-        Long elapsedTime = requestData.getElapsedTimeMillis();
-
-        logger.info(">> #" + requestNumber + " returned " + responseWrapper.getStatus() + ", took " + elapsedTime + " ms.");
-        logger.info(">> #" + requestNumber + " responded with '" + responseWrapper.getCopiedOutput() + "'");
+        getHttpLogger().logAfterResponse(requestWrapper, responseWrapper, requestData);
     }
 }

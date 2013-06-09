@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import grails.plugins.httplogger.AntPathRequestMatcher
+import grails.plugins.httplogger.DefaultHttpLogger
 import grails.plugins.httplogger.filters.LogGrailsUrlsInfoFilter
 import grails.plugins.httplogger.filters.LogOutputResponseFilter
 import grails.plugins.httplogger.filters.LogRawRequestInfoFilter
@@ -60,12 +61,15 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
             includeUrls = configuration.includeUrls ?: []
             excludeUrls = configuration.excludeUrls ?: []
         }
+
+        httpLogger(DefaultHttpLogger) {
+            headersToLog = configuration.headers ?: 'Cookie'
+        }
     }
     
     def doWithWebDescriptor = { webXml ->
         Map configuration = application.config.grails.plugins.httplogger
         Boolean enabled = configuration.enabled == null ? true : configuration.enabled
-        String headers = configuration.headers ?: 'Cookie'
         if (!enabled) return
 
         def contextParam = webXml.'context-param'
@@ -74,10 +78,6 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
             'filter' {
                 'filter-name'(StringUtils.uncapitalize(LogRawRequestInfoFilter.simpleName))
                 'filter-class'(LogRawRequestInfoFilter.name)
-                'init-param' {
-                    'param-name'('headers')
-                    'param-value'(headers)
-                }
             }
         }
 
