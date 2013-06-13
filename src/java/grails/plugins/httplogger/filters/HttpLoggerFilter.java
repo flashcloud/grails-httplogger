@@ -37,15 +37,35 @@ public abstract class HttpLoggerFilter extends GenericFilterBean {
 
     @Override
     final public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        MultiReadHttpServletRequest requestWrapper = new MultiReadHttpServletRequest((HttpServletRequest) request);
+        MultiReadHttpServletRequest requestWrapper = wrapIfNecessary(request);
         if (loggableRequestMatcher.matches(requestWrapper)) {
-            MultiReadHttpServletResponse responseWrapper = new MultiReadHttpServletResponse((HttpServletResponse) response);
+            MultiReadHttpServletResponse responseWrapper = wrapIfNecessary(response);
             logRequest(requestWrapper);
             chain.doFilter(requestWrapper, responseWrapper);
             logResponse(requestWrapper, responseWrapper);
         } else {
             chain.doFilter(requestWrapper, response);
         }
+    }
+
+    private MultiReadHttpServletRequest wrapIfNecessary(ServletRequest request) {
+        MultiReadHttpServletRequest requestWraper;
+        if (request instanceof MultiReadHttpServletRequest) {
+            requestWraper = (MultiReadHttpServletRequest) request;
+        } else {
+            requestWraper = new MultiReadHttpServletRequest((HttpServletRequest) request);
+        }
+        return requestWraper;
+    }
+    
+    private MultiReadHttpServletResponse wrapIfNecessary(ServletResponse response) {
+        MultiReadHttpServletResponse responseWraper;
+        if (response instanceof MultiReadHttpServletResponse) {
+            responseWraper = (MultiReadHttpServletResponse) response;
+        } else {
+            responseWraper = new MultiReadHttpServletResponse((HttpServletResponse) response);
+        }
+        return responseWraper;
     }
 
     protected void logRequest(MultiReadHttpServletRequest requestWrapper) throws IOException, ServletException {
