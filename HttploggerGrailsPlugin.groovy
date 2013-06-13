@@ -69,7 +69,7 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
     
     def doWithWebDescriptor = { webXml ->
         Map configuration = application.config.grails.plugins.httplogger
-        Boolean enabled = configuration.enabled == null ? true : configuration.enabled
+        Boolean enabled = configuration.enabled instanceof Boolean ? configuration.enabled : true
         if (!enabled) return
 
         def contextParam = webXml.'context-param'
