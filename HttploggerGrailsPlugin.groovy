@@ -21,7 +21,7 @@ import grails.plugins.httplogger.filters.LogRawRequestInfoFilter
 import org.springframework.util.StringUtils
 
 class HttploggerGrailsPlugin {
-    def version = "1.0"
+    def version = "1.1"
     def grailsVersion = "2.0 > *"
     def title = "Http Logger Plugin"
     def author = "Tomasz Kalkosiński"
