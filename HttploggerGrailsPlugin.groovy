@@ -41,7 +41,8 @@ I suggest to map all of your REST controllers with the same path in UrlMappings,
     def documentation = "https://github.com/TouK/grails-httplogger"
     def license = "APACHE"
     def organization = [ name: "TouK", url: "http://www.touk.pl/" ]
-    def developers = [ [ name: "Tomasz Kalkosiński", email: "tomasz.kalkosinski@gmail.com" ]]
+    def developers = [ [ name: "Tomasz Kalkosiński", email: "tomasz.kalkosinski@gmail.com" ],
+                       [ name: "Artur Gajowy", email: "artur.gajowy@gmail.com"] ]
     def issueManagement = [ system: "GitHub", url: "https://github.com/TouK/grails-httplogger/issues" ]
     def scm = [ url: "https://github.com/TouK/grails-httplogger" ]
 
