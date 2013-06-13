@@ -16,7 +16,7 @@ It is mostly useful for logging your REST traffic. Full HTTP web pages can be hu
 Add the following to your `BuildConfig.groovy`
 
 ```
-runtime ":httplogger:1.0"
+runtime ":httplogger:1.1"
 ```
 
 And be sure to enable logging for `grails.plugins.httlogger` at INFO level in `Config.groovy`:
