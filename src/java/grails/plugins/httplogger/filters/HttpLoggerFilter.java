@@ -44,7 +44,7 @@ public abstract class HttpLoggerFilter extends GenericFilterBean {
             chain.doFilter(requestWrapper, responseWrapper);
             logResponse(requestWrapper, responseWrapper);
         } else {
-            chain.doFilter(requestWrapper, response);
+            chain.doFilter(request, response);
         }
     }
 
