@@ -31,7 +31,14 @@ public class RequestData {
     }
 
     public Long getElapsedTimeMillis() {
-        return getEndTimeMillis() - getStartTimeMillis();
+        //Fix null error
+        Long end = 0l;
+        Long start = 0l;
+        if (getEndTimeMillis() != null)
+            end = getEndTimeMillis();
+        if (getStartTimeMillis() != null)
+            start = getStartTimeMillis();
+        return end - start;
     }
 
     public Long getStartTimeMillis() {
